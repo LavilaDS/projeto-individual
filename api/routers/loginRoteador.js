@@ -8,3 +8,7 @@ roteadores.get('/all', obterTodosUsuarios);
 roteadores.post('/', adicionarUsuario);
 roteadores.post('/:id', atualizarDadosUsuario);
 roteadores.delete('/id', removeUsuarioEspecífico);
+
+module.exports = {
+    roteadores
+}
