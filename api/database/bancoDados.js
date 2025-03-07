@@ -19,6 +19,17 @@ class BancoDados {
         });
     }
 
+    clear(){
+        if (this.fechado) throw new Error("Banco de Dados não está aberto");
+        return new Promise(async (resolve, reject) => {
+            await this.bancoDados.clear((err) => {
+                if(err) return reject()
+                resolve()
+            });
+
+        });
+    }
+
     close() {
         if (this.fechado) return;
         return new Promise((resolve, reject) => {
@@ -30,15 +41,13 @@ class BancoDados {
         });
     }
 
-    put(objeto, propriedade) {
+    put(chave, dados) {
+        console.log(chave, dados)
         if (this.fechado) throw new Error("Banco de Dados não está aberto");
 
         return new Promise((resolve, reject) => {
             try {
-                const chave = objeto[propriedade]
-                const stringJSON = JSON.stringify(objeto)
-
-                this.bancoDados.put(chave, stringJSON, err => {
+                this.bancoDados.put(chave, dados, err => {
                     if (err) return reject(err);
                     resolve();
                 });
@@ -49,6 +58,10 @@ class BancoDados {
         });
     }
 
+    batch(){
+        this.bancoDados.batch();
+    }
+
     get(chave) {
         if (this.fechado) throw new Error("Banco de Dados não está aberto");
     
@@ -56,11 +69,11 @@ class BancoDados {
             this.bancoDados.get(chave, (err, valor) => {
                 if (err) {
                     if (err.message && err.message.includes("NotFound")) {
-                        return reject({ status: 404, message: "Chave não encontrada" });
+                        return reject({ status: 404, mensagem: "chave não encontrada" });
                     }
                     return reject(err);
                 }
-                resolve(JSON.parse(valor.toString()));
+                resolve(valor.toString());
             });
         });
     }
@@ -99,7 +112,7 @@ class BancoDados {
                 for await (const [chave, valor] of iterador) {
                     count++;
                     chaveFinal = chave.toString(); 
-                    dados.push(valor.toString());
+                    dados.push({"chave":chave.toString(), valor:valor.toString()});
                     if (count >= limite) {
                         iterador.end();
                         break;
@@ -117,4 +130,5 @@ class BancoDados {
 module.exports = {
     bancoDadosLogin: new BancoDados('usuarios_db'),
     bancoDadosEventos: new BancoDados('eventos_db'),
+    bancoDadosIndice: new BancoDados('indices_db')
 }

@@ -10,10 +10,10 @@ const {
 } = require('../controllers/controladorUsuario.js');
 
 roteadores.get('/', obterUsuarioAtual);
-roteadores.get('/:id', obterUsuarioEspecifico);
 roteadores.get('/all', obterTodosUsuarios);
-roteadores.post('/', adicionarUsuario);
+roteadores.get('/:id', obterUsuarioEspecifico);
+roteadores.post('/cadastro', adicionarUsuario);
 roteadores.post('/:id', atualizarDadosUsuario);
-roteadores.delete('/id', removerUsuarioEspecifico);
+// roteadores.delete('/id', removerUsuarioEspecifico);
 
 module.exports = roteadores;

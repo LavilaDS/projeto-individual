@@ -16,14 +16,14 @@ const validarToken = async (valor) => {
                     console.log(err)
                     return reject(new Error("token inválido"));
                 }
-                resolve(user); // Resolve com os dados do usuário se o token for válido
+                resolve(user); 
             });
         });
 
-        return { sucesso: true, dados: user }; // Retorna sucesso e os dados do usuário
+        return { sucesso: true, status:200, dados: user };
     } catch (err) {
-        console.log(err)
-        return { sucesso: false, mensagem: err.message }; // Captura e retorna a mensagem de erro
+        if(err.message === "token não fornecido") return {sucesso:false, status:400, mensagem:err.message}
+        return { sucesso: false, status:500, mensagem: "erro interno no servidor" }; 
     }
 };
 
