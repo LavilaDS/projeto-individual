@@ -1,10 +1,16 @@
-const { bancoDadosLogin } = require('../database/bancoDados.js');
+const { bancoDadosLogin, bancoDadosIndice } = require('../database/bancoDados.js');
 const gerarToken = require('../utils/gerarToken.js');
-const { v4: uuidv4 } = require('uuid');
-
+const {compare} = require('bcrypt');
+const {validarEmail} = require('../utils/validarEmail.js');
+const {validarUsuario} = require('../utils/validarUsuario.js');
 
 const main = async() => {
     await bancoDadosLogin.open()
+    await bancoDadosIndice.open()
+    // await bancoDadosIndice.clear()
+    // await bancoDadosLogin.clear();
+    const dados = await bancoDadosIndice.getAll(undefined);
+    console.log(dados)
 }
 
 main()
@@ -17,15 +23,43 @@ const autenticarUsuario = async (req, res) => {
 
         const chaveSecundaria = usuario || email
 
-        if (!chaveSecundaria || !senha) {
-            res.cookie('token', '', { expires: new Date(0) });
-            return res.status(400).json({ success: false, mensagem:"email e senha são obrigatórios" });
+        if (!senha) {
+            enviarCookies(res, "tokenAtualizacao");
+            enviarCookies(res, "tokenAcesso");
+            return res.status(400).json({ success: false, mensagem:"senha nao foi fornecida" });
         }
 
-        const chavePrimaria = await bancoDadosLogin.get(chaveSecundaria);
-        const dados = JSON.parse(await bancoDadosLogin.get(chavePrimaria));
+        if(!usuario && !email){
+            enviarCookies(res, "tokenAtualizacao");
+            enviarCookies(res, "tokenAcesso");
+            return res.status(400).json({ success: false, mensagem:"usuário ou o email foram não fornecidos" });
+        }
 
-        if(dados.senha !== senha) {
+        if(email){
+            const emailValido = await validarEmail(email, true);
+            if(!emailValido.sucesso) {
+                enviarCookies(res, "tokenAtualizacao");
+                enviarCookies(res, "tokenAcesso");
+                return res.status(emailValido.status).json(emailValido);
+            } 
+        } else if(usuario){
+            const usuarioValido = await validarUsuario(usuario, true);
+            if(!usuarioValido.sucesso){
+                enviarCookies(res, "tokenAtualizacao");
+                enviarCookies(res, "tokenAcesso");
+                return res.status(usuarioValido.status).json(usuarioValido);
+
+            }
+        }
+
+        console.log("4")
+
+
+
+        const chavePrimaria = await bancoDadosIndice.get(chaveSecundaria);
+        const dados = JSON.parse(await bancoDadosLogin.get(chavePrimaria));
+        console.log("Tudo certo");
+        if(! await compare(senha, dados.senha)) {
             enviarCookies(res, "tokenAtualizacao", "");
             enviarCookies(res, "tokenAcesso", "");
             return res.status(401).json({
@@ -33,7 +67,8 @@ const autenticarUsuario = async (req, res) => {
                 mensagem: "credenciais inválidas" 
             });
         }
-
+        console.log("DADOS")
+        console.log(dados);
         const tokenAtualizacao = gerarToken(dados, "1h");
         const tokenAcesso = gerarToken(dados, '15m');
 
@@ -48,7 +83,7 @@ const autenticarUsuario = async (req, res) => {
 
         // console.log(err)
         if (err.status === 404) {
-            return res.status(404).json({ sucesso: false, mensagem: "usuário não encontrado" });
+            return res.status(404).json({ sucesso: false, mensagem: "credenciais inválidas" });
         }
         res.status(500).json({ sucesso: false, messagem: "erro interno no servidor" });
     }

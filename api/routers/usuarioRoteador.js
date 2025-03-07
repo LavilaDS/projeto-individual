@@ -13,7 +13,7 @@ roteadores.get('/', obterUsuarioAtual);
 roteadores.get('/all', obterTodosUsuarios);
 roteadores.get('/:id', obterUsuarioEspecifico);
 roteadores.post('/cadastro', adicionarUsuario);
-// roteadores.post('/:id', atualizarDadosUsuario);
+roteadores.post('/:id', atualizarDadosUsuario);
 // roteadores.delete('/id', removerUsuarioEspecifico);
 
 module.exports = roteadores;

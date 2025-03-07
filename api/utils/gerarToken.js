@@ -3,8 +3,9 @@ const jwt = require('jsonwebtoken');
 
 
 const gerarToken = (dados, tempoValidade) => {
-    const {usuario, nome, eventos } = dados
+    const {id,usuario, nome, eventos } = dados
     const carga = {
+        id,
         usuario,
         nome,
         eventos
