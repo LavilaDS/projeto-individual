@@ -7,7 +7,7 @@ class BancoDados {
         this.bancoDados = new RocksDB(this.caminho, { createIfMissing: true });
         this.fechado = true;
     }   
-    
+
     open() {
         if (!this.fechado) return;
         return new Promise((resolve, reject) => {
@@ -30,12 +30,12 @@ class BancoDados {
         });
     }
 
-    put(objeto) {
+    put(objeto, propriedade) {
         if (this.fechado) throw new Error("Banco de Dados não está aberto");
 
         return new Promise((resolve, reject) => {
             try {
-                const chave = objeto.idEvento;
+                const chave = objeto[propriedade]
                 const stringJSON = JSON.stringify(objeto)
 
                 this.bancoDados.put(chave, stringJSON, err => {
@@ -51,14 +51,20 @@ class BancoDados {
 
     get(chave) {
         if (this.fechado) throw new Error("Banco de Dados não está aberto");
-
-        return new Promise(async (resolve, reject) => {
+    
+        return new Promise((resolve, reject) => {
             this.bancoDados.get(chave, (err, valor) => {
-                if (err) return reject(err);
+                if (err) {
+                    if (err.message && err.message.includes("NotFound")) {
+                        return reject({ status: 404, message: "Chave não encontrada" });
+                    }
+                    return reject(err);
+                }
                 resolve(JSON.parse(valor.toString()));
             });
         });
     }
+    
 
     del(chave){
         return new Promise(async (resolve, reject) => {
@@ -109,5 +115,6 @@ class BancoDados {
 }
 
 module.exports = {
-    BancoDados
+    bancoDadosLogin: new BancoDados('usuarios_db'),
+    bancoDadosEventos: new BancoDados('eventos_db'),
 }
