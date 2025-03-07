@@ -1,12 +1,19 @@
-const gerarToken = (usuario, tempoValidade) => {
-    // Dados do payload, aqui você pode adicionar mais informações conforme necessário
-    const payload = {
-        id: usuario.id,
-        nome: usuario.nome
-    };
+const senhaSecreta = process.env.senhaSecreta
+console.log(`Senha secreta: ${senhaSecreta}`)
+const jwt = require('jsonwebtoken');
 
-    // Gerar o token com o tempo de expiração especificado
-    const refreshToken = jwt.sign(payload, 'seuSegredoAqui', {
+
+const gerarToken = (dados, tempoValidade) => {
+    console.log(dados);
+    const {usuario, nomeUsuario, eventos } = dados
+    console.log('Propriedades desestruturadas:', { usuario, nomeUsuario, eventos });
+    const carga = {
+        usuario,
+        nomeUsuario,
+        eventos
+    };
+    console.log(carga);
+    const refreshToken = jwt.sign(carga, senhaSecreta, {
         expiresIn: tempoValidade
     });
 

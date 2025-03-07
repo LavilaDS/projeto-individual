@@ -1,11 +1,9 @@
 const express = require('express');
 const roteadores = express.Router();
-const rotaLogin = require('./loginRoteador');
+const rotaLogin = require('./loginRoteador.js');
 
 roteadores.use('/login', rotaLogin);
-roteadores.use('/evento');
+// roteadores.use('/evento');
 
 
-module.exports = {
-    roteadores
-}
+module.exports = roteadores;

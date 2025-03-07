@@ -4,7 +4,7 @@ const {
     autenticarUsuario
 } = require('../controllers/controladorLogin.js')
 
-roteadores.get('/', autenticarUsuario);
+roteadores.post('/', autenticarUsuario);
 // roteadores.get('/:id', obterUsuarioEspecifico);
 // roteadores.get('/all', obterTodosUsuarios);
 // roteadores.post('/', adicionarUsuario);
