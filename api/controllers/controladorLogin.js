@@ -21,12 +21,16 @@ const autenticarUsuario = async (req, res) => {
         }
 
         const dados = await bancoDadosLogin.get(usuario);
-        console.log(dados)
+        // console.log(dados)
 
-        if(dados.senha !== senha) return res.status(401).json({
-            success: false,
-            message: "Credenciais inválidas" 
-        });
+        if(dados.senha !== senha) {
+            enviarCookies(res, "tokenAtualizacao", "");
+            enviarCookies(res, "tokenAcesso", "");
+            return res.status(401).json({
+                success: false,
+                message: "credenciais inválidas" 
+            });
+        }
 
         const tokenAtualizacao = gerarToken(dados, "1h");
         const tokenAcesso = gerarToken(dados, '15m');
@@ -36,23 +40,15 @@ const autenticarUsuario = async (req, res) => {
 
         res.status(200).json({ success: true });
     } catch (err) {
-        res.cookie('tokenAcesso', "", {
-            httpOnly: true,
-            secure: false,
-            expires: new Date(0)
-        });
-        
-        res.cookie('tokenAtualizacao', "", {
-            httpOnly: true,
-            secure: false,
-            expires: new Date(0)
-        });
 
-        console.log(err)
+        enviarCookies(res, "tokenAtualizacao", "");
+        enviarCookies(res, "tokenAcesso", "");
+
+        // console.log(err)
         if (err.status === 404) {
-            return res.status(404).json({ success: false, message: err.message });
+            return res.status(404).json({ sucesso: false, messagem: "usuário não encontrado" });
         }
-        res.status(500).json({ success: false, message: "Erro interno do servidor" });
+        res.status(500).json({ sucesso: false, messagem: "erro desconhecido" });
     }
 };
 

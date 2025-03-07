@@ -8,7 +8,7 @@ const enviarCookies = (res, chave, valor, tempo=undefined) => {
     } else {
         opcoes["expires"] = 0;
     }
-    console.log(opcoes);
+    // console.log(opcoes);
     res.cookie(chave, valor, opcoes);
 }
 

@@ -9,7 +9,6 @@ const {
     removerUsuarioEspecifico
 } = require('../controllers/controladorUsuario.js');
 
-console.log(atualizarDadosUsuario)
 roteadores.get('/', obterUsuarioAtual);
 roteadores.get('/:id', obterUsuarioEspecifico);
 roteadores.get('/all', obterTodosUsuarios);
