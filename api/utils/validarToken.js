@@ -20,10 +20,10 @@ const validarToken = async (valor) => {
             });
         });
 
-        return { sucesso: true, dados: user };
+        return { sucesso: true, status:200, dados: user };
     } catch (err) {
-        console.log(err)
-        return { sucesso: false, mensagem: err.message }; 
+        if(err.message === "token não fornecido") return {sucesso:false, status:400, mensagem:err.message}
+        return { sucesso: false, status:500, mensagem: "erro interno no servidor" }; 
     }
 };
 
