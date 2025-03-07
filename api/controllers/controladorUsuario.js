@@ -6,7 +6,6 @@ const obterUsuarioAtual = async (req, res) => {
     try{
         const token = req.cookies.tokenAcesso;
         console.log(token)
-        console.log("ASDSAD")
         const resultado = await validarToken(token);
 
         if(resultado.sucesso){
@@ -14,18 +13,34 @@ const obterUsuarioAtual = async (req, res) => {
         } else {
             return res.status(401).json({sucesso:false, mensagem:resultado.mensagem})
         }
-        res.status(200).json({sucess:true, dados:resultado.dados});
+        res.status(200).json({sucesso:true, dados:resultado.dados});
     }catch(err){
-        // console.log(err)
-        res.status(500).json({sucesso:false, messagem:"Erro desconhecido"})
+        res.status(500).json({sucesso:false, mensagem:"erro interno no servidor"})
     }
 
 };
 
 
-const obterUsuarioEspecifico = (req, res) => {
-    res.status(200).json({sucess:true});
+const obterUsuarioEspecifico = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        if (!userId) {
+            return res.status(400).json({ sucesso: false, mensagem: "id usuario é necessário" });
+        }
+        const dados = await bancoDadosLogin.get(userId); 
+        return res.status(200).json({ sucesso: true, dados });
+    } catch (err) {
+        if (err.status === 404) {
+            return res.status(404).json({ sucesso: false, mensagem: "usuário não encontrado" });
+        }
+        console.error("Erro ao buscar usuário:", err);
+        return res.status(500).json({ sucesso: false, mensagem: "erro interno no servidor" });
+    }
 };
+
+// const obterUsuarioEspecifico = (req, res) => {
+//     res.status(200).json({sucess:true});
+// };
 
 const obterTodosUsuarios = (req, res) => {
     res.status(200).json({sucess:true});

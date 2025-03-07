@@ -30,15 +30,13 @@ class BancoDados {
         });
     }
 
-    put(objeto, propriedade) {
+    put(chave, dados) {
+        console.log(chave, dados)
         if (this.fechado) throw new Error("Banco de Dados não está aberto");
 
         return new Promise((resolve, reject) => {
             try {
-                const chave = objeto[propriedade]
-                const stringJSON = JSON.stringify(objeto)
-
-                this.bancoDados.put(chave, stringJSON, err => {
+                this.bancoDados.put(chave, dados, err => {
                     if (err) return reject(err);
                     resolve();
                 });
@@ -56,11 +54,11 @@ class BancoDados {
             this.bancoDados.get(chave, (err, valor) => {
                 if (err) {
                     if (err.message && err.message.includes("NotFound")) {
-                        return reject({ status: 404, message: "Chave não encontrada" });
+                        return reject({ status: 404, mensagem: "chave não encontrada" });
                     }
                     return reject(err);
                 }
-                resolve(JSON.parse(valor.toString()));
+                resolve(valor.toString());
             });
         });
     }

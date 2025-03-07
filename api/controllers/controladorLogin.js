@@ -1,10 +1,10 @@
 const { bancoDadosLogin } = require('../database/bancoDados.js');
 const gerarToken = require('../utils/gerarToken.js');
+const { v4: uuidv4 } = require('uuid');
+
 
 const main = async() => {
     await bancoDadosLogin.open()
-    // const x = await bancoDadosLogin.getAll(undefined,10)
-    // console.log(x)
 }
 
 main()
@@ -13,22 +13,24 @@ const { enviarCookies } = require('../utils/enviarCookies.js')
 
 const autenticarUsuario = async (req, res) => {
     try {
-        const { usuario, senha } = req.body;
+        const {usuario, email, senha } = req.body;
 
-        if (!usuario || !senha) {
+        const chaveSecundaria = usuario || email
+
+        if (!chaveSecundaria || !senha) {
             res.cookie('token', '', { expires: new Date(0) });
-            return res.status(400).json({ success: false });
+            return res.status(400).json({ success: false, mensagem:"email e senha são obrigatórios" });
         }
 
-        const dados = await bancoDadosLogin.get(usuario);
-        // console.log(dados)
+        const chavePrimaria = await bancoDadosLogin.get(chaveSecundaria);
+        const dados = JSON.parse(await bancoDadosLogin.get(chavePrimaria));
 
         if(dados.senha !== senha) {
             enviarCookies(res, "tokenAtualizacao", "");
             enviarCookies(res, "tokenAcesso", "");
             return res.status(401).json({
-                success: false,
-                message: "credenciais inválidas" 
+                sucesso: false,
+                mensagem: "credenciais inválidas" 
             });
         }
 
@@ -40,15 +42,15 @@ const autenticarUsuario = async (req, res) => {
 
         res.status(200).json({ success: true });
     } catch (err) {
-
+        console.log(err)
         enviarCookies(res, "tokenAtualizacao", "");
         enviarCookies(res, "tokenAcesso", "");
 
         // console.log(err)
         if (err.status === 404) {
-            return res.status(404).json({ sucesso: false, messagem: "usuário não encontrado" });
+            return res.status(404).json({ sucesso: false, mensagem: "usuário não encontrado" });
         }
-        res.status(500).json({ sucesso: false, messagem: "erro desconhecido" });
+        res.status(500).json({ sucesso: false, messagem: "erro interno no servidor" });
     }
 };
 

@@ -11,9 +11,9 @@ const {
 
 roteadores.get('/', obterUsuarioAtual);
 roteadores.get('/:id', obterUsuarioEspecifico);
-roteadores.get('/all', obterTodosUsuarios);
-roteadores.post('/', adicionarUsuario);
-roteadores.post('/:id', atualizarDadosUsuario);
-roteadores.delete('/id', removerUsuarioEspecifico);
+// roteadores.get('/all', obterTodosUsuarios);
+// roteadores.post('/', adicionarUsuario);
+// roteadores.post('/:id', atualizarDadosUsuario);
+// roteadores.delete('/id', removerUsuarioEspecifico);
 
 module.exports = roteadores;
