@@ -3,10 +3,10 @@ const jwt = require('jsonwebtoken');
 
 
 const gerarToken = (dados, tempoValidade) => {
-    const {usuario, nomeUsuario, eventos } = dados
+    const {usuario, nome, eventos } = dados
     const carga = {
         usuario,
-        nomeUsuario,
+        nome,
         eventos
     };
     const refreshToken = jwt.sign(carga, senhaSecreta, {
